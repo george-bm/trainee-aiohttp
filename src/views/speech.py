@@ -12,7 +12,12 @@ speech_key = os.environ.get('SPEECH_KEY', None)
 async def speech_view(request):
     # retrieving data from client
     body = await request.post()
-    languageCode = body['lang']
+    if 'lang' not in body:
+        return web.Response(text='Please provide language code.', status=400)
+    if 'file' not in body:
+        return web.Response(text='Please provide audio file.', status=400)
+
+    language_code = body['lang']
     encoding = 'FLAC'
     input_file = body['file'].file
     content = input_file.read()
@@ -27,7 +32,7 @@ async def speech_view(request):
             "content": audio_str
         },
         "config": {
-            "languageCode": languageCode,
+            "languageCode": language_code,
             "encoding": encoding
         }
     }
